@@ -80,27 +80,9 @@ docker run -d --name radicale \
 ```
   
 Note on capabilities:
-- `CHOWN` is used to restore the permission of the `data` directory. Skip it if not chowning (see below)
+- (optional) `CHOWN` is used to restore the permission of the `data` directory. Skip it if not chowning (see below)
 - `SETUID` and `SETGID` are used to run radicale as the less privileged `radicale` user (with su-exec)
 - `KILL` is to allow Radicale to exit, and is always required.
-
-## Volumes versus Bind-Mounts
-
-This section is related to the error message `chown: /data: Permission denied`.
-
-With [Docker volumes](https://docs.docker.com/storage/volumes/), and not [bind-mounts](https://docs.docker.com/storage/bind-mounts/) like shown in the examples above, 
-you may need to disable the container trying to make the `data` directory writable.
-
-This is done with the `TAKE_FILE_OWNERSHIP` environment variable.  
-The variable will tell the container to perform or skip the `chown` instruction.  
-The default value is `true`: the container will try to make the `data` directory writable to the `radicale` user.  
-
-To disable the `chown`, declare the variable like this:
-
-```
-docker run -d --name radicale tomsquest/docker-radicale \
-    -e "TAKE_FILE_OWNERSHIP=false"
-```
 
 ## Running with Docker compose
 

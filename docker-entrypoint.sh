@@ -24,8 +24,13 @@ if [ -n "$UID" ] || [ -n "$GID" ]; then
 fi
 
 # If requested and running as root, mutate the ownership of bind-mounts
-if [ "$(id -u)" = "0" ] && [ "$TAKE_FILE_OWNERSHIP" = "true" ]; then
-    chown -R radicale:radicale /data
+if [ "$(id -u)" = "0" ]; then
+    echo "INFO fix ownership / permission issues for $(find /data ! -user "radicale" -or ! -perm -u=rw | wc -l) files"
+    if ! find /data ! -user "radicale" -exec chown -R "radicale" "{}" \;; then
+      echo "ERROR couldn't mutate ownership to radicale, did you provide --cap-add=CHOWN and is the volume writeable?"
+      exit 10
+    fi
+    find /data ! -perm -u=rw -exec chmod u+rw "{}" \;
 fi
 
 # Run radicale as the "radicale" user or any other command if provided
